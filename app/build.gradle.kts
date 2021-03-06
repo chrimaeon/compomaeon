@@ -60,7 +60,8 @@ android {
     buildTypes {
         named("release") {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro")
         }
     }
 
@@ -79,6 +80,9 @@ dependencies {
     implementation(Deps.AndroidX.coreKtx)
     implementation(Deps.AndroidX.appCompat)
     implementation(Deps.material)
+
+    implementation(Deps.AndroidX.lifecycleLivedataKtx)
+
     implementation(Deps.AndroidX.composeUi)
     // Tooling support (Previews, etc.)
     implementation(Deps.AndroidX.composeUiTooling)

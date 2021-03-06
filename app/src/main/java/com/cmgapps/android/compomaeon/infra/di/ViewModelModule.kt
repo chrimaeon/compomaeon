@@ -14,7 +14,20 @@
  * limitations under the License.
  */
 
-package com.cmgapps.android.compomaeon.infra
+package com.cmgapps.android.compomaeon.infra.di
 
-const val noPosition = -1
-const val noId = -1
+import com.cmgapps.android.compomaeon.data.TodoDao
+import com.cmgapps.android.compomaeon.data.TodoItemRepository
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.scopes.ViewModelScoped
+
+@Module
+@InstallIn(ViewModelComponent::class)
+object ViewModelModule {
+    @Provides
+    @ViewModelScoped
+    fun provideRepo(todoDao: TodoDao) = TodoItemRepository(todoDao)
+}

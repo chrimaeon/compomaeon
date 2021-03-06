@@ -18,8 +18,9 @@ package com.cmgapps.android.compomaeon.ui
 
 import androidx.compose.ui.graphics.Color
 
-val purple200 = Color(0xFFBB86FC)
-val purple500 = Color(0xFF6200EE)
-val purple700 = Color(0xFF3700B3)
-val teal200 = Color(0xFF03DAC5)
-val teal700 = Color(0xFF018786)
+val lightBlue200 = Color(0xFF81d4fa)
+val lightBlue500 = Color(0xFF03a9f4)
+val lightBlue700 = Color(0xFF0288d1)
+val amber200 = Color(0xFFffe082)
+val amber500 = Color(0xFFffca28)
+val amber700 = Color(0xFFffa000)

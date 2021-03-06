@@ -26,7 +26,7 @@ const val kotlinVersion = "1.4.30"
 const val benManesVersionsVersion = "0.38.0"
 const val composeVersion = "1.0.0-beta01"
 const val hiltVersion = "2.33-beta"
-const val roomVersion = "2.2.5"
+const val roomVersion = "2.2.6"
 
 object Deps {
     object GradlePlugins {
@@ -49,12 +49,13 @@ object Deps {
         const val composeViewModel = "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha02"
         const val composeLiveData = "androidx.compose.runtime:runtime-livedata:$composeVersion"
 
-        const val room = "androidx.room:room-runtime:$roomVersion"
+        const val room = "androidx.room:room-ktx:$roomVersion"
         const val roomCompiler = "androidx.room:room-compiler:$roomVersion"
+
+        const val lifecycleLivedataKtx = "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0"
 
         const val extJunit = "androidx.test.ext:junit:1.1.2"
         const val espresso = "androidx.test.espresso:espresso-core:3.3.0"
-
     }
 
     const val ktlint = "com.pinterest:ktlint:0.40.0"

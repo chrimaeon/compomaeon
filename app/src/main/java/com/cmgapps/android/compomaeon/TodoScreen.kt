@@ -36,6 +36,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -45,10 +46,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -60,23 +63,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.cmgapps.android.compomaeon.data.TodoIcon
+import com.cmgapps.android.compomaeon.data.TodoItem
+import com.cmgapps.android.compomaeon.infra.Resource
+import com.cmgapps.android.compomaeon.infra.Resource.Loading
+import com.cmgapps.android.compomaeon.infra.Resource.Success
+import com.cmgapps.android.compomaeon.ui.TodoTheme
 import com.cmgapps.android.compomaeon.util.generateRandomTodoItem
+import kotlinx.coroutines.launch
 
 @Composable
 fun TodoScreen(
-    items: List<TodoItem>,
+    items: Resource<List<TodoItem>>,
     currentlyEditing: TodoItem?,
     onAddItem: (TodoItem) -> Unit,
     onRemoveItem: (TodoItem) -> Unit,
@@ -86,7 +98,7 @@ fun TodoScreen(
 ) {
 
     Scaffold(
-        floatingActionButton = { TodoFloatingActionButton(onAddItem = onAddItem) }
+        floatingActionButton = { TodoFloatingActionButton(onAddItem = onAddItem)},
     ) {
         TodoContent(
             items = items,
@@ -114,7 +126,7 @@ fun TodoFloatingActionButton(onAddItem: (TodoItem) -> Unit) {
 
 @Composable
 fun TodoContent(
-    items: List<TodoItem>,
+    items: Resource<List<TodoItem>>?,
     currentlyEditing: TodoItem?,
     onAddItem: (TodoItem) -> Unit,
     onRemoveItem: (TodoItem) -> Unit,
@@ -141,25 +153,56 @@ fun TodoContent(
             }
         }
 
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(top = 8.dp, bottom = 56.dp + 16.dp)
-        ) {
-            items(items = items) { todo ->
-                if (currentlyEditing?.id == todo.id) {
-                    TodoItemInlineEditor(
-                        item = currentlyEditing,
-                        onEditItemChange = onEditItemChange,
-                        onEditDone = onEditDone,
-                        onRemoveItem = onRemoveItem
-                    )
-                } else {
-                    TodoRow(
-                        todo = todo,
-                        onItemClicked = onStartEdit,
-                        modifier = Modifier.fillParentMaxWidth()
-                    )
-                }
+        when (items) {
+            is Loading -> Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(alignment = Alignment.Center)
+                )
+            }
+            is Success -> TodoList(
+                items = items.data,
+                currentlyEditing = currentlyEditing,
+                onRemoveItem = onRemoveItem,
+                onStartEdit = onStartEdit,
+                onEditItemChange = onEditItemChange,
+                onEditDone = onEditDone,
+                modifier = Modifier.weight(1f)
+            )
+            else -> Unit
+        }
+    }
+}
+
+@Composable
+fun TodoList(
+    items: List<TodoItem>,
+    currentlyEditing: TodoItem?,
+    onRemoveItem: (TodoItem) -> Unit,
+    onStartEdit: (TodoItem) -> Unit,
+    onEditItemChange: (TodoItem) -> Unit,
+    onEditDone: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(top = 8.dp, bottom = 56.dp + 16.dp)
+    ) {
+        items(key = { it.id }, items = items) { todo ->
+            if (currentlyEditing?.id == todo.id) {
+                TodoItemInlineEditor(
+                    item = currentlyEditing,
+                    onEditItemChange = onEditItemChange,
+                    onEditDone = onEditDone,
+                    onRemoveItem = onRemoveItem
+                )
+            } else {
+                TodoRow(
+                    todo = todo,
+                    onItemClicked = onStartEdit,
+                    modifier = Modifier.fillParentMaxWidth()
+                )
             }
         }
     }
@@ -210,11 +253,16 @@ fun TodoItemEntryInput(onItemComplete: (TodoItem) -> Unit) {
     val (text, setText) = remember { mutableStateOf("") }
     val (icon, setIcon) = remember { mutableStateOf(TodoIcon.Default) }
     val iconsVisible = text.isNotBlank()
-    val submit = {
-        onItemComplete(TodoItem(text, icon))
+
+
+    val submit= {
+        if (text.isNotBlank()) {
+            onItemComplete(TodoItem(text, icon))
+        }
         setIcon(TodoIcon.Default)
         setText("")
     }
+
     TodoItemInput(
         text = text,
         onTextChange = setText,
@@ -294,8 +342,12 @@ fun TodoEditButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
+    val focusManager = LocalFocusManager.current
     TextButton(
-        onClick = onClick,
+        onClick = {
+            onClick()
+            focusManager.clearFocus()
+        },
         shape = CircleShape,
         enabled = enabled,
         modifier = modifier
@@ -415,16 +467,31 @@ fun PreviewTodoScreen() {
         TodoItem("line2", TodoIcon.Trash)
     )
 
-    TodoScreen(items, null, { }, { }, { }, { }, { })
+    TodoTheme {
+        TodoScreen(Success(items), null, { }, { }, { }, { }, { })
+    }
+}
+
+@Preview
+@Composable
+fun PreviewTodoScreenDark() {
+    val items = listOf(
+        TodoItem("Line1", TodoIcon.Event),
+        TodoItem("line2", TodoIcon.Trash)
+    )
+
+    TodoTheme(darkTheme = true) {
+        TodoScreen(Success(items), null, { }, { }, { }, { }, { })
+    }
 }
 
 @Preview
 @Composable
 fun PreviewTodoRow() {
-    TodoRow(todo = TodoItem("Task", TodoIcon.Event), onItemClicked = { })
+    TodoRow(todo = TodoItem("Task", TodoIcon.Event), { })
 }
 
 @Preview
 @Composable
-fun PreviewTodoItemInput() = TodoItemEntryInput(onItemComplete = { })
+fun PreviewTodoItemInput() = TodoItemEntryInput { }
 // endregion

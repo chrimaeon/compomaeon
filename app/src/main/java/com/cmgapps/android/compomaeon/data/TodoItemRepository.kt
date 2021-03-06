@@ -14,7 +14,21 @@
  * limitations under the License.
  */
 
-package com.cmgapps.android.compomaeon.infra
+package com.cmgapps.android.compomaeon.data
 
-const val noPosition = -1
-const val noId = -1
+class TodoItemRepository(private val todoDao: TodoDao) {
+
+    fun getItems() = todoDao.getTodos()
+
+    suspend fun addItem(item: TodoItem) {
+        todoDao.insertItem(item)
+    }
+
+    suspend fun removeItem(item: TodoItem) {
+        todoDao.deleteItem(item)
+    }
+
+    suspend fun updateItem(item: TodoItem) {
+        todoDao.updateItem(item)
+    }
+}

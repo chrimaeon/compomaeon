@@ -22,8 +22,13 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.cmgapps.android.compomaeon.infra.Resource
 import com.cmgapps.android.compomaeon.ui.TodoTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class TodoActivity : AppCompatActivity() {
 
     private val viewModel: TodoViewModel by viewModels()
@@ -42,8 +47,9 @@ class TodoActivity : AppCompatActivity() {
 
 @Composable
 private fun TodoActivityScreen(viewModel: TodoViewModel) {
+    val items by viewModel.todoItems.collectAsState(Resource.Loading)
     TodoScreen(
-        items = viewModel.todoItems,
+        items = items,
         currentlyEditing = viewModel.currentEditItem,
         onAddItem = viewModel::addItem,
         onRemoveItem = viewModel::removeItem,

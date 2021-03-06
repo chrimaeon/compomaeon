@@ -16,5 +16,8 @@
 
 package com.cmgapps.android.compomaeon.infra
 
-const val noPosition = -1
-const val noId = -1
+sealed class Resource<out T : Any> {
+    object Loading : Resource<Nothing>()
+    data class Success<out T : Any>(val data: T) : Resource<T>()
+    data class Error(val error: Throwable) : Resource<Nothing>()
+}

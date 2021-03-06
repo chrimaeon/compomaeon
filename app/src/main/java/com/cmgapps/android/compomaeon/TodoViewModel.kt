@@ -20,41 +20,55 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.cmgapps.android.compomaeon.infra.noPosition
+import androidx.lifecycle.viewModelScope
+import com.cmgapps.android.compomaeon.data.TodoItem
+import com.cmgapps.android.compomaeon.data.TodoItemRepository
+import com.cmgapps.android.compomaeon.infra.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TodoViewModel : ViewModel() {
+@HiltViewModel
+class TodoViewModel @Inject constructor(
+    private val todoItemRepository: TodoItemRepository,
+) : ViewModel() {
 
-    private var currentEditPosition by mutableStateOf(noPosition)
-    var todoItems: List<TodoItem> by mutableStateOf(listOf())
+    var todoItems: Flow<Resource<List<TodoItem>>> = todoItemRepository.getItems().map {
+        Resource.Success(it)
+    }
 
-    val currentEditItem: TodoItem?
-        get() = todoItems.getOrNull(currentEditPosition)
+    var currentEditItem: TodoItem? by mutableStateOf(null)
+        private set
 
     fun addItem(item: TodoItem) {
-        todoItems = todoItems + item
+        viewModelScope.launch {
+            todoItemRepository.addItem(item)
+        }
     }
 
     fun removeItem(item: TodoItem) {
-        todoItems = todoItems.toMutableList().also { it.remove(item) }
+        viewModelScope.launch {
+            todoItemRepository.removeItem(item)
+        }
         onEditDone()
     }
 
     fun onEditItemSelected(item: TodoItem) {
-        currentEditPosition = todoItems.indexOf(item)
+        currentEditItem = item
     }
 
     fun onEditDone() {
-        currentEditPosition = noPosition
+        val currentItem = requireNotNull(currentEditItem)
+
+        viewModelScope.launch {
+            todoItemRepository.updateItem(currentItem)
+            currentEditItem = null
+        }
     }
 
     fun onEditItemChange(item: TodoItem) {
-        val currentItem = requireNotNull(currentEditItem)
-        require(currentItem.id == item.id) {
-            "You can only change an item with the same id as currentEditItem"
-        }
-
-        todoItems = todoItems.toMutableList().also {
-            it[currentEditPosition] = item
-        }
+        currentEditItem = item
     }
 }

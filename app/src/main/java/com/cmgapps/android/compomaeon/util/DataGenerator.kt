@@ -16,8 +16,8 @@
 
 package com.cmgapps.android.compomaeon.util
 
-import com.cmgapps.android.compomaeon.TodoIcon
-import com.cmgapps.android.compomaeon.TodoItem
+import com.cmgapps.android.compomaeon.data.TodoIcon
+import com.cmgapps.android.compomaeon.data.TodoItem
 
 fun generateRandomTodoItem(): TodoItem {
     val message = listOf(
@@ -33,13 +33,4 @@ fun generateRandomTodoItem(): TodoItem {
     ).random()
     val icon = TodoIcon.values().random()
     return TodoItem(message, icon)
-}
-
-fun main() {
-    val list = listOf(1, 2, 3)
-    var currentCount = 0
-    for (item in list) {
-        currentCount += item
-        println(currentCount)
-    }
 }
