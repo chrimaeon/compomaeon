@@ -27,4 +27,8 @@
     <string name="cd_restore">Restore</string>
     <string name="cd_add_item">Add Random Item</string>
     <string name="whoops">Whoops, something went wrong</string>
+    <string name="cd_delete">Delete item</string>
+    <string name="editing_item">Editing item</string>
+    <string name="add">Add</string>
+    <string name="save">Save</string>
 </resources>

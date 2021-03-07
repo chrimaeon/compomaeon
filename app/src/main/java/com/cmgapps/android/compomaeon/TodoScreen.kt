@@ -14,21 +14,24 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalMaterialApi::class)
+
 package com.cmgapps.android.compomaeon
 
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -48,18 +51,27 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.DismissDirection.EndToStart
+import androidx.compose.material.DismissDirection.StartToEnd
+import androidx.compose.material.DismissValue.Default
+import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
+import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Surface
+import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.rememberDismissState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -69,6 +81,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -112,9 +125,7 @@ fun TodoScreen(
         TodoContent(
             items = items,
             currentlyEditing = currentlyEditing,
-            onAddItem = {
-                onAddItem(it)
-            },
+            onAddItem = onAddItem,
             onRemoveItem = onRemoveItem,
             onStartEdit = onStartEdit,
             onEditItemChange = onEditItemChange,
@@ -153,7 +164,7 @@ private fun TodoContent(
                 TodoItemEntryInput(onAddItem)
             } else {
                 Text(
-                    "Editing item",
+                    stringResource(R.string.editing_item),
                     style = MaterialTheme.typography.h6,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
@@ -206,15 +217,16 @@ private fun TodoList(
                     item = currentlyEditing,
                     onEditItemChange = onEditItemChange,
                     onEditDone = onEditDone,
-                    onRemoveItem = onRemoveItem
                 )
             } else {
-                TodoRow(
-                    todo = todo,
-                    onItemClicked = onStartEdit,
-                    modifier = Modifier.fillParentMaxWidth()
+                SwipeToDeleteListItem(
+                    item = todo,
+                    modifier = modifier,
+                    onStartEdit = onStartEdit,
+                    onDelete = onRemoveItem
                 )
             }
+            Divider()
         }
     }
 }
@@ -239,22 +251,62 @@ private fun TodoItemInputBackground(
 }
 
 @Composable
-private fun TodoRow(
-    todo: TodoItem,
-    onItemClicked: (TodoItem) -> Unit,
+fun SwipeToDeleteListItem(
+    item: TodoItem,
     modifier: Modifier = Modifier,
+    onStartEdit: (TodoItem) -> Unit,
+    onDelete: (TodoItem) -> Unit
 ) {
-    Row(
-        modifier = modifier
-            .clickable { onItemClicked(todo) }
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(todo.task)
+    val dismissState = rememberDismissState()
 
-        Icon(
-            imageVector = todo.icon.imageVector,
-            contentDescription = stringResource(todo.icon.contentDescription)
+    if (dismissState.currentValue != Default) {
+        onDelete(item)
+    }
+
+    SwipeToDismiss(
+        state = dismissState,
+        background = {
+            val direction = dismissState.dismissDirection ?: return@SwipeToDismiss
+
+            val color by animateColorAsState(
+                when (dismissState.targetValue) {
+                    Default -> Color.LightGray
+                    else -> Color.Red
+                }
+            )
+
+            val alignment = when (direction) {
+                StartToEnd -> Alignment.CenterStart
+                EndToStart -> Alignment.CenterEnd
+            }
+
+            val scale by animateFloatAsState(if (dismissState.targetValue == Default) 0.75f else 1f)
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(color)
+                    .padding(horizontal = 20.dp),
+                contentAlignment = alignment
+            ) {
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = stringResource(R.string.cd_delete),
+                    modifier = Modifier.scale(scale)
+                )
+            }
+        }
+    ) {
+        ListItem(
+            modifier = modifier
+                .clickable { onStartEdit(item) }
+                .background(MaterialTheme.colors.surface),
+            text = { Text(item.task) },
+            icon = {
+                Icon(
+                    imageVector = item.icon.imageVector,
+                    contentDescription = stringResource(item.icon.contentDescription)
+                )
+            }
         )
     }
 }
@@ -275,25 +327,24 @@ private fun TodoItemEntryInput(onItemComplete: (TodoItem) -> Unit) {
 
     TodoItemInput(
         text = text,
+        buttonText = stringResource(R.string.add),
         onTextChange = setText,
         icon = icon,
         onIconChange = setIcon,
         submit = submit,
         iconsVisible = iconsVisible
-    ) {
-        TodoEditButton(onClick = submit, text = "Add", enabled = text.isNotBlank())
-    }
+    )
 }
 
 @Composable
 private fun TodoItemInput(
     text: String,
+    buttonText: String,
     onTextChange: (String) -> Unit,
     icon: TodoIcon,
     onIconChange: (TodoIcon) -> Unit,
     submit: () -> Unit,
     iconsVisible: Boolean,
-    buttonSlot: @Composable () -> Unit,
 ) {
     Column {
         Row(
@@ -310,7 +361,13 @@ private fun TodoItemInput(
                 onImeAction = submit
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Box(Modifier.align(Alignment.CenterVertically)) { buttonSlot() }
+            Box(Modifier.align(Alignment.CenterVertically)) {
+                TodoEditButton(
+                    onClick = submit,
+                    text = buttonText,
+                    enabled = text.isNotBlank()
+                )
+            }
         }
         if (iconsVisible) {
             AnimatedIconRow(icon, onIconChange, Modifier.padding(top = 8.dp))
@@ -431,7 +488,7 @@ private fun SelectableIconButton(
             Icon(
                 imageVector = icon,
                 tint = tint,
-                contentDescription = stringResource(id = iconContentDescription)
+                contentDescription = stringResource(iconContentDescription)
             )
             if (isSelected) {
                 Box(
@@ -453,20 +510,15 @@ private fun TodoItemInlineEditor(
     item: TodoItem,
     onEditItemChange: (TodoItem) -> Unit,
     onEditDone: () -> Unit,
-    onRemoveItem: (TodoItem) -> Unit,
 ) = TodoItemInput(
     text = item.task,
+    buttonText = stringResource(R.string.save),
     onTextChange = { onEditItemChange(item.copy(task = it)) },
     icon = item.icon,
     onIconChange = { onEditItemChange(item.copy(icon = it)) },
     submit = onEditDone,
     iconsVisible = true
-) {
-    Row {
-        TodoEditButton(text = "Done", onClick = onEditDone)
-        TodoEditButton(text = "Delete", onClick = { onRemoveItem(item) })
-    }
-}
+)
 
 // region Preview
 @Preview
@@ -493,12 +545,6 @@ fun PreviewTodoScreenDark() {
     TodoTheme(darkTheme = true) {
         TodoScreen(Success(items), null, { }, { }, { }, { }, { })
     }
-}
-
-@Preview
-@Composable
-fun PreviewTodoRow() {
-    TodoRow(todo = TodoItem("Task", TodoIcon.Event), { })
 }
 
 @Preview
