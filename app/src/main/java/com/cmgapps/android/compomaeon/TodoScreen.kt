@@ -41,6 +41,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -51,7 +52,7 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -59,11 +60,12 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -84,7 +86,6 @@ import com.cmgapps.android.compomaeon.infra.Resource.Loading
 import com.cmgapps.android.compomaeon.infra.Resource.Success
 import com.cmgapps.android.compomaeon.ui.TodoTheme
 import com.cmgapps.android.compomaeon.util.generateRandomTodoItem
-import kotlinx.coroutines.launch
 
 @Composable
 fun TodoScreen(
@@ -95,15 +96,25 @@ fun TodoScreen(
     onStartEdit: (TodoItem) -> Unit,
     onEditItemChange: (TodoItem) -> Unit,
     onEditDone: () -> Unit,
+    scaffoldState: ScaffoldState = rememberScaffoldState(),
 ) {
+    if (items is Resource.Error) {
+        val message = stringResource(R.string.whoops)
+        LaunchedEffect(scaffoldState) {
+            scaffoldState.snackbarHostState.showSnackbar(message)
+        }
+    }
 
     Scaffold(
-        floatingActionButton = { TodoFloatingActionButton(onAddItem = onAddItem)},
+        scaffoldState = scaffoldState,
+        floatingActionButton = { TodoFloatingActionButton(onAddItem = onAddItem) },
     ) {
         TodoContent(
             items = items,
             currentlyEditing = currentlyEditing,
-            onAddItem = onAddItem,
+            onAddItem = {
+                onAddItem(it)
+            },
             onRemoveItem = onRemoveItem,
             onStartEdit = onStartEdit,
             onEditItemChange = onEditItemChange,
@@ -155,11 +166,11 @@ fun TodoContent(
 
         when (items) {
             is Loading -> Box(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize(Alignment.Center)
             ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(alignment = Alignment.Center)
-                )
+                CircularProgressIndicator()
             }
             is Success -> TodoList(
                 items = items.data,
@@ -254,8 +265,7 @@ fun TodoItemEntryInput(onItemComplete: (TodoItem) -> Unit) {
     val (icon, setIcon) = remember { mutableStateOf(TodoIcon.Default) }
     val iconsVisible = text.isNotBlank()
 
-
-    val submit= {
+    val submit = {
         if (text.isNotBlank()) {
             onItemComplete(TodoItem(text, icon))
         }
