@@ -4,6 +4,7 @@
 /.idea/*
 !/.idea/copyright
 !/.idea/codeStyles
+!/.idea/inspectionProfiles
 .DS_Store
 /build
 /captures
