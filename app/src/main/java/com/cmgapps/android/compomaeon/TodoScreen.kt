@@ -124,7 +124,7 @@ fun TodoScreen(
 }
 
 @Composable
-fun TodoFloatingActionButton(onAddItem: (TodoItem) -> Unit) {
+private fun TodoFloatingActionButton(onAddItem: (TodoItem) -> Unit) {
     FloatingActionButton(
         onClick = { onAddItem(generateRandomTodoItem()) }
     ) {
@@ -136,7 +136,7 @@ fun TodoFloatingActionButton(onAddItem: (TodoItem) -> Unit) {
 }
 
 @Composable
-fun TodoContent(
+private fun TodoContent(
     items: Resource<List<TodoItem>>?,
     currentlyEditing: TodoItem?,
     onAddItem: (TodoItem) -> Unit,
@@ -187,7 +187,7 @@ fun TodoContent(
 }
 
 @Composable
-fun TodoList(
+private fun TodoList(
     items: List<TodoItem>,
     currentlyEditing: TodoItem?,
     onRemoveItem: (TodoItem) -> Unit,
@@ -220,7 +220,7 @@ fun TodoList(
 }
 
 @Composable
-fun TodoItemInputBackground(
+private fun TodoItemInputBackground(
     elevate: Boolean,
     modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit,
@@ -239,7 +239,7 @@ fun TodoItemInputBackground(
 }
 
 @Composable
-fun TodoRow(
+private fun TodoRow(
     todo: TodoItem,
     onItemClicked: (TodoItem) -> Unit,
     modifier: Modifier = Modifier,
@@ -260,7 +260,7 @@ fun TodoRow(
 }
 
 @Composable
-fun TodoItemEntryInput(onItemComplete: (TodoItem) -> Unit) {
+private fun TodoItemEntryInput(onItemComplete: (TodoItem) -> Unit) {
     val (text, setText) = remember { mutableStateOf("") }
     val (icon, setIcon) = remember { mutableStateOf(TodoIcon.Default) }
     val iconsVisible = text.isNotBlank()
@@ -286,7 +286,7 @@ fun TodoItemEntryInput(onItemComplete: (TodoItem) -> Unit) {
 }
 
 @Composable
-fun TodoItemInput(
+private fun TodoItemInput(
     text: String,
     onTextChange: (String) -> Unit,
     icon: TodoIcon,
@@ -322,7 +322,7 @@ fun TodoItemInput(
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun TodoInputText(
+private fun TodoInputText(
     text: String,
     onTextChange: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -346,7 +346,7 @@ fun TodoInputText(
 }
 
 @Composable
-fun TodoEditButton(
+private fun TodoEditButton(
     onClick: () -> Unit,
     text: String,
     modifier: Modifier = Modifier,
@@ -368,7 +368,7 @@ fun TodoEditButton(
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun AnimatedIconRow(
+private fun AnimatedIconRow(
     icon: TodoIcon,
     onIconChange: (TodoIcon) -> Unit,
     modifier: Modifier = Modifier,
@@ -392,7 +392,7 @@ fun AnimatedIconRow(
 }
 
 @Composable
-fun IconRow(
+private fun IconRow(
     icon: TodoIcon,
     onIconChange: (TodoIcon) -> Unit,
     modifier: Modifier = Modifier,
@@ -449,7 +449,7 @@ private fun SelectableIconButton(
 }
 
 @Composable
-fun TodoItemInlineEditor(
+private fun TodoItemInlineEditor(
     item: TodoItem,
     onEditItemChange: (TodoItem) -> Unit,
     onEditDone: () -> Unit,

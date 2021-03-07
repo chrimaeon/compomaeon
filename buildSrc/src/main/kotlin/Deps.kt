@@ -27,6 +27,7 @@ const val benManesVersionsVersion = "0.38.0"
 const val composeVersion = "1.0.0-beta01"
 const val hiltVersion = "2.33-beta"
 const val roomVersion = "2.2.6"
+const val mockitoVersion = "3.8.0"
 
 object Deps {
     object GradlePlugins {
@@ -53,9 +54,22 @@ object Deps {
         const val roomCompiler = "androidx.room:room-compiler:$roomVersion"
 
         const val lifecycleLivedataKtx = "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0"
+    }
+
+    object Testing {
+        const val junitBom = "org.junit:junit-bom:5.7.1"
+        const val junitJupiter = "org.junit.jupiter:junit-jupiter"
+
+        const val mockito = "org.mockito:mockito-core:$mockitoVersion"
+        const val mockitoKotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
+        const val mockitoJupiter = "org.mockito:mockito-junit-jupiter:$mockitoVersion"
+
+        const val coroutinesTest = "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.3"
 
         const val extJunit = "androidx.test.ext:junit:1.1.2"
         const val espresso = "androidx.test.espresso:espresso-core:3.3.0"
+
+        const val hamcrest = "org.hamcrest:hamcrest:2.2"
     }
 
     const val ktlint = "com.pinterest:ktlint:0.40.0"
@@ -64,7 +78,6 @@ object Deps {
     const val hiltCompiler = "com.google.dagger:hilt-compiler:$hiltVersion"
 
     const val material = "com.google.android.material:material:1.3.0"
-    const val jUnit = "junit:junit:4.13.2"
 }
 
 val PluginDependenciesSpec.daggerHilt: PluginDependencySpec

@@ -52,7 +52,6 @@ class TodoViewModel @Inject constructor(
         viewModelScope.launch {
             todoItemRepository.removeItem(item)
         }
-        onEditDone()
     }
 
     fun onEditItemSelected(item: TodoItem) {

@@ -60,8 +60,10 @@ android {
     buildTypes {
         named("release") {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 
@@ -73,6 +75,15 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
         freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
+    }
+
+    testOptions {
+        unitTests.all { test ->
+            test.useJUnitPlatform()
+            test.testLogging {
+                events("passed", "skipped", "failed")
+            }
+        }
     }
 }
 
@@ -105,8 +116,14 @@ dependencies {
     implementation(Deps.AndroidX.room)
     kapt(Deps.AndroidX.roomCompiler)
 
-    testImplementation(Deps.jUnit)
+    testImplementation(platform(Deps.Testing.junitBom))
+    testImplementation(Deps.Testing.junitJupiter)
+    testImplementation(Deps.Testing.mockito)
+    testImplementation(Deps.Testing.mockitoKotlin)
+    testImplementation(Deps.Testing.mockitoJupiter)
+    testImplementation(Deps.Testing.coroutinesTest)
+    testImplementation(Deps.Testing.hamcrest)
 
-    androidTestImplementation(Deps.AndroidX.extJunit)
-    androidTestImplementation(Deps.AndroidX.espresso)
+    androidTestImplementation(Deps.Testing.extJunit)
+    androidTestImplementation(Deps.Testing.espresso)
 }
