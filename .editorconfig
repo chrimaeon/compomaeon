@@ -9,6 +9,7 @@ trim_trailing_whitespace=true
 
 [*.{kt,kts}]
 ij_kotlin_imports_layout=*,java.**,javax.**,kotlin.**,^
+kotlin_imports_layout=idea
 
 [*.{json,yml}]
 indent_size=2

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import org.gradle.api.tasks.wrapper.Wrapper.DistributionType
 
 buildscript {
@@ -41,5 +42,9 @@ tasks {
     named<Wrapper>("wrapper") {
         this.gradleVersion = Gradle.gradleVersion
         distributionType = DistributionType.ALL
+    }
+
+    withType<DependencyUpdatesTask> {
+        revision = "release"
     }
 }

@@ -36,7 +36,6 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.Update
 import com.cmgapps.android.compomaeon.R
-import com.cmgapps.android.compomaeon.infra.noId
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
