@@ -35,9 +35,7 @@ class TodoViewModel @Inject constructor(
     private val todoItemRepository: TodoItemRepository,
 ) : ViewModel() {
 
-    var todoItems: Flow<Resource<List<TodoItem>>> = todoItemRepository.getItems().map {
-        Resource.Success(it)
-    }
+    var todoItems: Flow<Resource<List<TodoItem>>> = todoItemRepository.getItems()
 
     var currentEditItem: TodoItem? by mutableStateOf(null)
         private set

@@ -16,9 +16,14 @@
 
 package com.cmgapps.android.compomaeon.data
 
+import com.cmgapps.android.compomaeon.infra.Resource
+import kotlinx.coroutines.flow.map
+
 class TodoItemRepository(private val todoDao: TodoDao) {
 
-    fun getItems() = todoDao.getTodos()
+    fun getItems() = todoDao.getTodos().map {
+        Resource.Success(it)
+    }
 
     suspend fun addItem(item: TodoItem) {
         todoDao.insertItem(item)
