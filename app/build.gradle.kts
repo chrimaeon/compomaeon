@@ -89,7 +89,6 @@ android {
 
 dependencies {
     implementation(Deps.AndroidX.coreKtx)
-    implementation(Deps.AndroidX.appCompat)
     implementation(Deps.material)
 
     implementation(Deps.AndroidX.lifecycleLivedataKtx)
