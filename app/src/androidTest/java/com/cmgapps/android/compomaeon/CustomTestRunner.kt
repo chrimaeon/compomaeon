@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package com.cmgapps.android.compomaeon.infra.di
+package com.cmgapps.android.compomaeon
 
-import com.cmgapps.android.compomaeon.data.TodoDao
-import com.cmgapps.android.compomaeon.data.TodoItemRepository
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
-import dagger.hilt.android.scopes.ViewModelScoped
+import android.app.Application
+import android.content.Context
+import androidx.test.runner.AndroidJUnitRunner
+import dagger.hilt.android.testing.HiltTestApplication
 
-@Module
-@InstallIn(ViewModelComponent::class)
-object ViewModelModule {
-    @Provides
-    @ViewModelScoped
-    fun provideRepo(todoDao: TodoDao) = TodoItemRepository(todoDao)
+class TodoAppTestRunner : AndroidJUnitRunner() {
+
+    override fun newApplication(cl: ClassLoader?, name: String?, context: Context?): Application {
+        return super.newApplication(cl, HiltTestApplication::class.java.name, context)
+    }
 }

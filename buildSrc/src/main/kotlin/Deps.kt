@@ -68,6 +68,9 @@ object Deps {
         const val espresso = "androidx.test.espresso:espresso-core:3.3.0"
 
         const val hamcrest = "org.hamcrest:hamcrest:2.2"
+        const val composeUiTest = "androidx.compose.ui:ui-test-junit4:$composeVersion"
+
+        const val hiltTesting = "com.google.dagger:hilt-android-testing:$hiltVersion"
     }
 
     const val ktlint = "com.pinterest:ktlint:0.40.0"

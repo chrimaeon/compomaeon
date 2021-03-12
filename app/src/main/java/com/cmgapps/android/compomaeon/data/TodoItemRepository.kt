@@ -17,11 +17,14 @@
 package com.cmgapps.android.compomaeon.data
 
 import com.cmgapps.android.compomaeon.infra.Resource
+import dagger.hilt.android.scopes.ViewModelScoped
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
-class TodoItemRepository(private val todoDao: TodoDao) {
+@ViewModelScoped
+class TodoItemRepository @Inject constructor(private val todoDao: TodoDao) {
 
     fun getItems(): Flow<Resource<List<TodoItem>>> = todoDao.getTodos().map {
         Resource.Success(it)

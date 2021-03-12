@@ -33,7 +33,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.cmgapps.android.compomaeon.TodoAppTestRunner"
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -85,6 +85,21 @@ android {
             }
         }
     }
+
+    packagingOptions {
+        // resources.excludes += setOf("META-INF/AL2.0", "META-INF/LGPL2.1")
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        force(Deps.Testing.hamcrest)
+        dependencySubstitution {
+            substitute(module("org.hamcrest:hamcrest-core")).with(module(Deps.Testing.hamcrest))
+            substitute(module("org.hamcrest:hamcrest-integration")).with(module(Deps.Testing.hamcrest))
+            substitute(module("org.hamcrest:hamcrest-library")).with(module(Deps.Testing.hamcrest))
+        }
+    }
 }
 
 dependencies {
@@ -125,4 +140,10 @@ dependencies {
 
     androidTestImplementation(Deps.Testing.extJunit)
     androidTestImplementation(Deps.Testing.espresso)
+    androidTestImplementation(Deps.Testing.hamcrest)
+
+    androidTestImplementation(Deps.Testing.composeUiTest)
+
+    androidTestImplementation(Deps.Testing.hiltTesting)
+    kaptAndroidTest(Deps.hiltCompiler)
 }

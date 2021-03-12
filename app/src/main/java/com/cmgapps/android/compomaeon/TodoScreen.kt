@@ -87,6 +87,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -137,6 +138,7 @@ fun TodoScreen(
 @Composable
 private fun TodoFloatingActionButton(onAddItem: (TodoItem) -> Unit) {
     FloatingActionButton(
+        modifier = Modifier.testTag("AddTodoFAB"),
         onClick = { onAddItem(generateRandomTodoItem()) }
     ) {
         Icon(
@@ -208,7 +210,7 @@ private fun TodoList(
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
-        modifier = modifier,
+        modifier = modifier.testTag("TodoList"),
         contentPadding = PaddingValues(top = 8.dp, bottom = 56.dp + 16.dp)
     ) {
         items(key = { it.id }, items = items) { todo ->
@@ -357,7 +359,8 @@ private fun TodoItemInput(
                 onTextChange,
                 Modifier
                     .weight(1f)
-                    .padding(end = 8.dp),
+                    .padding(end = 8.dp)
+                    .testTag("TodoItemInput"),
                 onImeAction = submit
             )
             Spacer(modifier = Modifier.width(8.dp))
