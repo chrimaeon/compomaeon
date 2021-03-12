@@ -18,12 +18,12 @@ package com.cmgapps.android.compomaeon
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cmgapps.android.compomaeon.infra.Resource
 import com.cmgapps.android.compomaeon.ui.TodoTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,14 +31,12 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class TodoActivity : AppCompatActivity() {
 
-    private val viewModel: TodoViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             TodoTheme {
                 Surface {
-                    TodoActivityScreen(viewModel)
+                    TodoActivityScreen()
                 }
             }
         }
@@ -46,15 +44,15 @@ class TodoActivity : AppCompatActivity() {
 }
 
 @Composable
-private fun TodoActivityScreen(viewModel: TodoViewModel) {
-    val items by viewModel.todoItems.collectAsState(Resource.Loading)
+private fun TodoActivityScreen(todoViewModel: TodoViewModel = viewModel()) {
+    val items by todoViewModel.todoItems.collectAsState(Resource.Loading)
     TodoScreen(
         items = items,
-        currentlyEditing = viewModel.currentEditItem,
-        onAddItem = viewModel::addItem,
-        onRemoveItem = viewModel::removeItem,
-        onStartEdit = viewModel::onEditItemSelected,
-        onEditItemChange = viewModel::onEditItemChange,
-        onEditDone = viewModel::onEditDone
+        currentlyEditing = todoViewModel.currentEditItem,
+        onAddItem = todoViewModel::addItem,
+        onRemoveItem = todoViewModel::removeItem,
+        onStartEdit = todoViewModel::onEditItemSelected,
+        onEditItemChange = todoViewModel::onEditItemChange,
+        onEditDone = todoViewModel::onEditDone
     )
 }
