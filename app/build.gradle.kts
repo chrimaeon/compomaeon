@@ -87,7 +87,7 @@ android {
     }
 
     packagingOptions {
-        // resources.excludes += setOf("META-INF/AL2.0", "META-INF/LGPL2.1")
+        resources.excludes += setOf("META-INF/AL2.0", "META-INF/LGPL2.1")
     }
 }
 
@@ -139,6 +139,7 @@ dependencies {
     testImplementation(Deps.Testing.hamcrest)
 
     androidTestImplementation(Deps.Testing.extJunit)
+    androidTestImplementation(Deps.Testing.archCoreTesting)
     androidTestImplementation(Deps.Testing.espresso)
     androidTestImplementation(Deps.Testing.hamcrest)
 

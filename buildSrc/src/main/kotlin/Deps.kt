@@ -71,6 +71,8 @@ object Deps {
         const val composeUiTest = "androidx.compose.ui:ui-test-junit4:$composeVersion"
 
         const val hiltTesting = "com.google.dagger:hilt-android-testing:$hiltVersion"
+
+        const val archCoreTesting = "androidx.arch.core:core-testing:2.1.0"
     }
 
     const val ktlint = "com.pinterest:ktlint:0.40.0"

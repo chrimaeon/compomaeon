@@ -29,6 +29,7 @@ import androidx.room.Database
 import androidx.room.Delete
 import androidx.room.Entity
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.RoomDatabase
@@ -85,7 +86,7 @@ interface TodoDao {
     @Query("SELECT * FROM todos")
     fun getTodos(): Flow<List<TodoItem>>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertItem(item: TodoItem)
 
     @Update
@@ -93,6 +94,9 @@ interface TodoDao {
 
     @Delete
     suspend fun deleteItem(item: TodoItem)
+
+    @Query("DELETE FROM todos")
+    suspend fun deleteItems()
 }
 
 @Database(entities = [TodoItem::class], version = 1)
