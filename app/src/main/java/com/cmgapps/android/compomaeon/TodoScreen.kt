@@ -48,6 +48,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.CircularProgressIndicator
@@ -298,10 +299,13 @@ fun SwipeToDeleteListItem(
             }
         }
     ) {
+        val isDismissing = dismissState.dismissDirection != null
+        val cornerRadius by animateDpAsState(targetValue = if (isDismissing) 4.dp else 0.dp)
+        val background = if (isDismissing) MaterialTheme.colors.surface else Color.Transparent
         ListItem(
             modifier = modifier
-                .clickable { onStartEdit(item) }
-                .background(MaterialTheme.colors.surface),
+                .background(color = background, shape = RoundedCornerShape(cornerRadius))
+                .clickable { onStartEdit(item) },
             text = { Text(item.task) },
             icon = {
                 Icon(
